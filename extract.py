@@ -13,10 +13,16 @@ def extract_clue(tweet_text):
     return x[0].strip()
 
 
+def postprocess_explanation(tweet_text):
+    s = re.sub(r"https://t\.co/\w+", "", tweet_text)
+    s = re.sub(r"#explanationfriday", "", s)
+    return s.strip()
+
+
 df = pd.read_json("raw_tweets.jsonl", lines=True, orient="records")
 df["clue"] = df["clue_tweet_text"].apply(extract_clue)
+df["explanation"] = df["explanation_tweet_text"].apply(postprocess_explanation)
 df = df.assign(
-    explanation=df["explanation_tweet_text"].str.strip(),
     clue_created_at=df["clue_tweet_created_at"],
     explanation_created_at=df["explanation_tweet_created_at"],
     clue_url="https://twitter.com/stellaphone/status/"
